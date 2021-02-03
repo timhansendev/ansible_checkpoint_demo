@@ -1,0 +1,57 @@
+---
+- name: Add and Set TCP Service
+  hosts: checkpoint
+
+  vars:
+    source_ip: "{{ hostvars['attacker']['private_ip2'] }}"
+    destination_ip: "{{ hostvars['snort']['private_ip2'] }}"
+
+  tasks:
+    - name: "Check state"
+      block:
+        - name: Create source IP host object
+          cp_mgmt_host:
+            name: "asa-{{ source_ip }}"
+            ip_address: "{{ source_ip }}"
+            auto_publish_session: true
+
+        - name: Create destination IP host object
+          cp_mgmt_host:
+            name: "asa-{{ destination_ip }}"
+            ip_address: "{{ destination_ip }}"
+            auto_publish_session: true
+
+        - name: Create access rule to allow access from source to destination
+          cp_mgmt_access_rule:
+            layer: Network
+            position: top
+            name: "asa-accept-{{ source_ip }}-to-{{ destination_ip }}"
+            source: "asa-{{ source_ip }}"
+            destination: "asa-{{ destination_ip }}"
+            action: accept
+            auto_publish_session: true
+
+        # Setting up a TCP service and setting it.
+        - name: Add Service TCP
+          cp_mgmt_service_tcp:
+            # Sets short (aggressive) timeouts for idle connections.
+            aggressive_aging:
+              enable: true
+              timeout: 360
+              use_default_timeout: false
+            # This allows us to force clients to reconnect after policy update, if any.
+            keep_connections_open_after_policy_installation: false
+            name: "demo_tcp_service"
+            port: "5669"
+            state: present
+            auto_publish_session: true
+
+      rescue:
+          - name: "Get rid of any unsaved changes"
+            cp_mgmt_discard:
+
+    - name: "Install policy"
+      cp_mgmt_install_policy:
+        access: true
+        policy_package: standard
+        threat_prevention: true
