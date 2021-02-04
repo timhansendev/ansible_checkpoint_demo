@@ -1,0 +1,12 @@
+---
+- name: Get Mgmt threat profile facts
+  hosts: checkpoint
+  tasks:
+    - name: show-packages
+      cp_mgmt_package_facts:
+        details_level: standard
+        limit: 50
+      register: threat_facts
+
+    - name: show facts
+      debug: var=threat_facts
