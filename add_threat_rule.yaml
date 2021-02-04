@@ -1,0 +1,15 @@
+---
+- name: Add threat rule
+  hosts: checkpoint
+  tasks:
+    - name: set-threat-rule
+      cp_mgmt_threat_rule:
+        action: Optimized
+        comments: "Ansible installed"
+        install_on: Policy Targets
+        layer: "Example-threat-layer-1"
+        name: "Ansible-Demo-Rule"
+        protected_scope: All_Internet
+        position: 1
+        state: present
+        auto_publish_session: true
