@@ -1,0 +1,10 @@
+---
+- name: Install policy
+  hosts: checkpoint
+  tasks:
+    - name: "Install policy"
+      cp_mgmt_install_policy:
+        access: true
+        policy_package: standard
+        threat_prevention: true
+
