@@ -1,0 +1,17 @@
+---
+- name: Setup threat layer 
+  hosts: checkpoint
+  tasks:
+    - name: "Add a new threat layer 1"
+      cp_mgmt_threat_layer:
+        name: "Example-threat-layer-1"
+        comments: "Added from ansible playbook"
+        state: present
+        auto_publish_session: yes
+
+    - name: "Add a new threat layer 2"
+      cp_mgmt_threat_layer:
+        name: "Example-threat-layer-2"
+        comments: "Added from ansible playbook"
+        state: present
+        auto_publish_session: yes
